@@ -35,6 +35,7 @@ class TidesScreen(Screen):
                 self.second["h"] = t.tm_hour
                 self.second["m"] = t.tm_min
                 self.second["s"] = t.tm_sec
+                break
             if extreme['dt'] > time.time(): 
                 t = time.gmtime(extreme['dt'])
                 self.next = extreme
