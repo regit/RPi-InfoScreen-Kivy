@@ -27,8 +27,11 @@ class TidesScreen(Screen):
             self.tides = None
 
     def get_next(self):
-        self.next = self.tides['extremes'][0] 
-        t = time.gmtime(self.next['dt'])
-        self.next["h"] = t.tm_hour
-        self.next["m"] = t.tm_min
-        self.next["s"] = t.tm_sec
+        for extreme in self.tides['extremes']:
+            if extreme['dt'] > time.time(): 
+                t = time.gmtime(extreme['dt'])
+                self.next = extreme
+                self.next["h"] = t.tm_hour
+                self.next["m"] = t.tm_min
+                self.next["s"] = t.tm_sec
+                break
