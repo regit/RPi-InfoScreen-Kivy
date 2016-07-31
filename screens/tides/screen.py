@@ -7,12 +7,12 @@ class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=86400&key={key}"
 
     def __init__(self, **kwargs):
-        super(TidesScreen, self).__init__(**kwargs)
         # Init data by checking cache then calling API
         self.location = kwargs["params"]["location"]
         self.key = kwargs["params"]["key"]
         self.get_data()
         self.get_next()
+        super(TidesScreen, self).__init__(**kwargs)
 
     def buildURL(self, location):
         lon = location['coords']['lon']
@@ -27,11 +27,18 @@ class TidesScreen(Screen):
             self.tides = None
 
     def get_next(self):
+        found = False
         for extreme in self.tides['extremes']:
+            if found:
+                t = time.gmtime(extreme['dt'])
+                self.second = extreme
+                self.second["h"] = t.tm_hour
+                self.second["m"] = t.tm_min
+                self.seconf["s"] = t.tm_sec
             if extreme['dt'] > time.time(): 
                 t = time.gmtime(extreme['dt'])
                 self.next = extreme
                 self.next["h"] = t.tm_hour
                 self.next["m"] = t.tm_min
                 self.next["s"] = t.tm_sec
-                break
+                found = True
