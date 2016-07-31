@@ -1,11 +1,11 @@
 {
     "screen": "TidesScreen",
     "kv": "tides.kv",
-    "dependencies": [],
+    "dependencies": ["requests"],
     "enabled": false,
     "params": {
         "key": "YOUR_API_KEY_HERE",
-        "locations": [
+        "location": [
             {"name": "Escalles",
              "coords": {"lon": 50.921650, "lat": 1.701273}}
          ]

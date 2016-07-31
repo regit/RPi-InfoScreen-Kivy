@@ -15,8 +15,8 @@ class TidesScreen(Screen):
         self.get_next()
 
     def buildURL(self, location):
-        lon = location['lon']
-        lat = location['lat']
+        lon = location['coords']['lon']
+        lat = location['coords']['lat']
         return self.tidesurl.format(key=self.key, lon=lon, lat=lat)
 
     def get_data(self):
