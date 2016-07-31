@@ -1,0 +1,14 @@
+{
+    "screen": "TidesScreen",
+    "kv": "tides.kv",
+    "dependencies": [],
+    "enabled": false,
+    "params": {
+        "key": "YOUR_API_KEY_HERE",
+        "locations": [
+            {"name": "Escalles",
+             "address": "Escalles"}
+         ]
+    }
+
+}
