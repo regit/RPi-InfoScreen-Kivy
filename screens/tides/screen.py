@@ -35,12 +35,12 @@ class TidesScreen(Screen):
 
     def get_data(self):
         self.url_tides = self.buildURL(self.location)
-        #with open('screens/tides/result.json') as data_file:    
-        #    self.tides = json.load(data_file)
-        try:
-            self.tides = requests.get(self.url_tides).json()
-        except:
-            self.tides = None
+        with open('screens/tides/result.json') as data_file:
+            self.tides = json.load(data_file)
+        #try:
+        #    self.tides = requests.get(self.url_tides).json()
+        #except:
+        #    self.tides = None
 
     def get_time(self):
         """Sets self.timedata to current time."""
