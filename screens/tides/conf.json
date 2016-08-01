@@ -1,7 +1,7 @@
 {
     "screen": "TidesScreen",
     "kv": "tides.kv",
-    "dependencies": ["requests"],
+    "dependencies": ["requests", "dateutil"],
     "enabled": true,
     "params": {
         "key": "YOUR_API_KEY_HERE",
