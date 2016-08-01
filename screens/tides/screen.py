@@ -26,20 +26,40 @@ class TidesScreen(Screen):
         except:
             self.tides = None
 
+    def get_time(self):
+        """Sets self.timedata to current time."""
+        n = datetime.now()
+        self.timedata["h"] = n.hour
+        self.timedata["m"] = n.minute
+        self.timedata["s"] = n.second
+
     def get_next(self):
         found = False
-        for extreme in self.tides['extremes']:
-            if found:
-                t = time.gmtime(extreme['dt'])
-                self.second = extreme
-                self.second["h"] = t.tm_hour
-                self.second["m"] = t.tm_min
-                self.second["s"] = t.tm_sec
-                break
+        for extreme in sorted(self.tides['extremes'], key=lambda extr: extrm['dt']):
             if extreme['dt'] > time.time(): 
                 t = time.gmtime(extreme['dt'])
                 self.next = extreme
                 self.next["h"] = t.tm_hour
                 self.next["m"] = t.tm_min
                 self.next["s"] = t.tm_sec
-                found = True
+                t = time.gmtime(self.prev['dt'])
+                self.prev["h"] = t.tm_hour
+                self.prev["m"] = t.tm_min
+                self.prev["s"] = t.tm_sec
+                break
+            else:
+                self.prev = extreme
+
+    def update(self, dt):
+        self.get_time()
+
+    def on_enter(self):
+        # We only need to update the clock every second.
+        self.timer = Clock.schedule_interval(self.update, 1)
+
+    def on_pre_enter(self):
+        self.get_time()
+
+    def on_pre_leave(self):
+        # Save resource by unscheduling the updates.
+        Clock.unschedule(self.timer)

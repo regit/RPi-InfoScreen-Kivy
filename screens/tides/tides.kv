@@ -1,10 +1,15 @@
 <TidesScreen>:
     Label:
+        pos: 0, -130
+        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.prev)
+        markup: True
+
+    Label:
         pos: 0, 0
-        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.next)
+        text: "[size=70]{type:s} {h:02d}:{m:02d}[/size][size=50] {s:02d}[/size]".format(**root.timedata)
         markup: True
 
     Label:
         pos: 0, 130
-        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.second)
+        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.next)
         markup: True
