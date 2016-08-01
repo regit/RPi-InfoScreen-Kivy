@@ -1,7 +1,7 @@
 <TidesScreen>:
     Label:
         pos: 0, 130
-        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.prev)
+        text: "[size=100]{type_i18n:s} {h:02d}:{m:02d}[/size]".format(**root.prev)
         markup: True
 
     Label:
@@ -11,5 +11,5 @@
 
     Label:
         pos: 0, -130
-        text: "[size=120]{type:s} {h:02d}:{m:02d}[/size]".format(**root.next)
+        text: "[size=100]{type_i18n:s} {h:02d}:{m:02d}[/size]".format(**root.next)
         markup: True

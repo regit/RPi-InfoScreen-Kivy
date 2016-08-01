@@ -4,6 +4,7 @@
     "dependencies": ["requests", "dateutil", "pytz"],
     "enabled": true,
     "params": {
+        "language": "english",
         "key": "YOUR_API_KEY_HERE",
         "location": 
             {"name": "Escalles",
