@@ -1,4 +1,6 @@
 from kivy.uix.label import Label
+from kivy.properties import DictProperty
+from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 import requests
 import time
