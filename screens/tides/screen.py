@@ -2,9 +2,11 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 import requests
 import time
+from datetime import datetime
 
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=86400&key={key}"
+    timedata = DictProperty(None)
 
     def __init__(self, **kwargs):
         # Init data by checking cache then calling API
@@ -12,7 +14,9 @@ class TidesScreen(Screen):
         self.key = kwargs["params"]["key"]
         self.get_data()
         self.get_next()
+        self.get_time()
         super(TidesScreen, self).__init__(**kwargs)
+        self.timer = None
 
     def buildURL(self, location):
         lon = location['coords']['lon']
