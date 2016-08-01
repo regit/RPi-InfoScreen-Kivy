@@ -52,8 +52,8 @@ class TidesScreen(Screen):
     def get_next(self):
         found = False
         for extreme in sorted(self.tides['extremes'], key=lambda extr: extr['dt']):
-            date = dateutil.parser.parse(extreme['date'])
-            if date > datetime.now(pytz.utc): 
+            date = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
+            if date > datetime.now():
                 self.next = extreme
                 #date.replace(tzinfo = tz.tzlocal())
                 self.next["h"] = date.hour
