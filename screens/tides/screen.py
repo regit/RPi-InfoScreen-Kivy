@@ -15,6 +15,8 @@ import json
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
+    next = DictProperty(None)
+    prev = DictProperty(None)
     types_map = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
     def __init__(self, **kwargs):
@@ -48,27 +50,33 @@ class TidesScreen(Screen):
         self.timedata["h"] = n.hour
         self.timedata["m"] = n.minute
         self.timedata["s"] = n.second
+        if n >= self.next_extreme:
+            self.get_next()
 
     def get_next(self):
         found = False
+        prev = None
         for extreme in sorted(self.tides['extremes'], key=lambda extr: extr['dt']):
             date = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
             if date > datetime.now():
-                self.next = extreme
+                next = extreme
                 #date.replace(tzinfo = tz.tzlocal())
-                self.next["h"] = date.hour
-                self.next["m"] = date.minute
-                self.next["s"] = date.second
-                self.next["type_i18n"] = self.types_map[self.language][self.next["type"]]
-                date = dateutil.parser.parse(self.prev['date'])
+                next["h"] = date.hour
+                next["m"] = date.minute
+                next["s"] = date.second
+                next["type_i18n"] = self.types_map[self.language][next["type"]]
+                self.next_extreme = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
+                date = dateutil.parser.parse(prev['date'])
                 #date.replace(tzinfo = tz.tzlocal())
-                self.prev["h"] = date.hour
-                self.prev["m"] = date.minute
-                self.prev["s"] = date.second
-                self.prev["type_i18n"] = self.types_map[self.language][self.prev["type"]]
+                prev["h"] = date.hour
+                prev["m"] = date.minute
+                prev["s"] = date.second
+                prev["type_i18n"] = self.types_map[self.language][prev["type"]]
+                self.next = next
+                self.prev = prev
                 break
             else:
-                self.prev = extreme
+                prev = extreme
 
     def update(self, dt):
         self.get_time()
