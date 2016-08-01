@@ -12,6 +12,8 @@ import pytz
 
 import json
 
+MIN_TIDES = 7
+
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
@@ -56,7 +58,8 @@ class TidesScreen(Screen):
     def get_next(self):
         found = False
         prev = None
-        for extreme in sorted(self.tides['extremes'], key=lambda extr: extr['dt']):
+        oldentries = []
+        for extreme in self.tides['extremes']:
             date = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
             if date > datetime.now():
                 next = extreme
@@ -76,7 +79,14 @@ class TidesScreen(Screen):
                 self.prev = prev
                 break
             else:
+                if prev:
+                    oldentries.append(prev)
                 prev = extreme
+        # clean up old entries
+        self.tides['extremes'] = [x for x in self.tides['extremes'] if x not in oldentries]
+        # fetch new one if our set is small
+        if len(self.tides['extremes']) <= MIN_TIDES:
+            self.get_data()
 
     def update(self, dt):
         self.get_time()
