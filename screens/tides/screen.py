@@ -35,7 +35,7 @@ class TidesScreen(Screen):
 
     def get_next(self):
         found = False
-        for extreme in sorted(self.tides['extremes'], key=lambda extr: extrm['dt']):
+        for extreme in sorted(self.tides['extremes'], key=lambda extr: extr['dt']):
             if extreme['dt'] > time.time(): 
                 t = time.gmtime(extreme['dt'])
                 self.next = extreme
