@@ -15,11 +15,13 @@ import json
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
+    types_map = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
     def __init__(self, **kwargs):
         # Init data by checking cache then calling API
         self.location = kwargs["params"]["location"]
         self.key = kwargs["params"]["key"]
+        self.language = kwargs["params"]["language"]
         self.get_data()
         self.get_next()
         self.get_time()
@@ -57,11 +59,13 @@ class TidesScreen(Screen):
                 self.next["h"] = date.hour
                 self.next["m"] = date.minute
                 self.next["s"] = date.second
+                self.next["type_i18n"] = self.types_map[self.language][self.next["type"]]
                 date = dateutil.parser.parse(self.prev['date'])
                 #date.replace(tzinfo = tz.tzlocal())
                 self.prev["h"] = date.hour
                 self.prev["m"] = date.minute
                 self.prev["s"] = date.second
+                self.prev["type_i18n"] = self.types_map[self.language][self.prev["type"]]
                 break
             else:
                 self.prev = extreme
