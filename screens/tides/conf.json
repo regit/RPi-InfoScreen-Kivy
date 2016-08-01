@@ -2,7 +2,7 @@
     "screen": "TidesScreen",
     "kv": "tides.kv",
     "dependencies": ["requests"],
-    "enabled": false,
+    "enabled": true,
     "params": {
         "key": "YOUR_API_KEY_HERE",
         "location": 

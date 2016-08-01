@@ -2,12 +2,18 @@ from kivy.uix.label import Label
 from kivy.properties import DictProperty
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
+
 import requests
 import time
 from datetime import datetime
+import dateutil.parser
+from dateutil import tz
+import pytz
+
+import json
 
 class TidesScreen(Screen):
-    tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=86400&key={key}"
+    tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
 
     def __init__(self, **kwargs):
@@ -27,6 +33,8 @@ class TidesScreen(Screen):
 
     def get_data(self):
         self.url_tides = self.buildURL(self.location)
+        #with open('screens/tides/result.json') as data_file:    
+        #    self.tides = json.load(data_file)
         try:
             self.tides = requests.get(self.url_tides).json()
         except:
@@ -42,16 +50,18 @@ class TidesScreen(Screen):
     def get_next(self):
         found = False
         for extreme in sorted(self.tides['extremes'], key=lambda extr: extr['dt']):
-            if extreme['dt'] > time.time(): 
-                t = time.gmtime(extreme['dt'])
+            date = dateutil.parser.parse(extreme['date'])
+            if date > datetime.now(pytz.utc): 
                 self.next = extreme
-                self.next["h"] = t.tm_hour
-                self.next["m"] = t.tm_min
-                self.next["s"] = t.tm_sec
-                t = time.gmtime(self.prev['dt'])
-                self.prev["h"] = t.tm_hour
-                self.prev["m"] = t.tm_min
-                self.prev["s"] = t.tm_sec
+                #date.replace(tzinfo = tz.tzlocal())
+                self.next["h"] = date.hour
+                self.next["m"] = date.minute
+                self.next["s"] = date.second
+                date = dateutil.parser.parse(self.prev['date'])
+                #date.replace(tzinfo = tz.tzlocal())
+                self.prev["h"] = date.hour
+                self.prev["m"] = date.minute
+                self.prev["s"] = date.second
                 break
             else:
                 self.prev = extreme
