@@ -60,17 +60,17 @@ class TidesScreen(Screen):
         prev = None
         oldentries = []
         for extreme in self.tides['extremes']:
-            date = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
-            if date > datetime.now():
+            date = dateutil.parser.parse(extreme['date'])
+            if date > datetime.now(tz = tz.tzutc()):
                 next = extreme
-                #date.replace(tzinfo = tz.tzlocal())
+                date = date.astimezone(tz.tzlocal())
                 next["h"] = date.hour
                 next["m"] = date.minute
                 next["s"] = date.second
                 next["type_i18n"] = self.types_map[self.language][next["type"]]
                 self.next_extreme = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
                 date = dateutil.parser.parse(prev['date'])
-                #date.replace(tzinfo = tz.tzlocal())
+                date = date.astimezone(tz.tzlocal())
                 prev["h"] = date.hour
                 prev["m"] = date.minute
                 prev["s"] = date.second
