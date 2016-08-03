@@ -1,13 +1,18 @@
 <TidesScreen>:
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'screens/tides/images/escalles.jpg'
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
             orientation: "horizontal"
             Label:
-                text: "[size=60]{type_i18n:s} {h:02d}:{m:02d}[/size]".format(**root.prev)
+                text: "[color=#fffffff][size=60]{type_i18n:s} {h:02d}:{m:02d}[/size][/color]".format(**root.prev)
                 markup: True
             Label:
-                text: "[size=60]{type_i18n:s} {h:02d}:{m:02d}[/size]".format(**root.next)
+                text: "[color=#fffffff][size=60]{type_i18n:s} {h:02d}:{m:02d}[/size][/color]".format(**root.next)
                 markup: True
         Label:
             text: "[size=50]{h:02d}:{m:02d}[/size][size=50] {s:02d}[/size]".format(**root.timedata)
