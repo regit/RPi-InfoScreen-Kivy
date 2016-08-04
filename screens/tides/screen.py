@@ -13,19 +13,24 @@ from dateutil import tz
 import pytz
 
 import json
+import locale
 
 MIN_TIDES = 7
+
+TYPES_MAP = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
 class Tide(BoxLayout):
     desc = StringProperty("")
 
     def __init__(self, **kwargs):
         super(Tide, self).__init__(**kwargs)
+        self.language = kwargs["language"]
         self.buildText(kwargs["summary"])
 
     def buildText(self, summary):
         summary["ldate"] = dateutil.parser.parse(summary["date"]).strftime("%A, %H:%m")
-        self.desc = ("{type:s}\n{ldate:s}").format(**summary)
+        summary["type_i18n"] = TYPES_MAP[self.language][summary["type"]]
+        self.desc = ("{type_i18n:s}\n{ldate:s}").format(**summary)
 
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
@@ -33,13 +38,14 @@ class TidesScreen(Screen):
     next = DictProperty(None)
     prev = DictProperty(None)
     location = DictProperty(None)
-    types_map = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
     def __init__(self, **kwargs):
         # Init data by checking cache then calling API
         self.location = kwargs["params"]["location"]
         self.key = kwargs["params"]["key"]
         self.language = kwargs["params"]["language"]
+        if self.language == "french":
+            locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
         self.get_data()
         self.get_time()
         self.get_next()
@@ -83,14 +89,14 @@ class TidesScreen(Screen):
                 next["h"] = date.hour
                 next["m"] = date.minute
                 next["s"] = date.second
-                next["type_i18n"] = self.types_map[self.language][next["type"]]
+                next["type_i18n"] = TYPES_MAP[self.language][next["type"]]
                 self.next_extreme = dateutil.parser.parse(extreme['date']).replace(tzinfo=None)
                 date = dateutil.parser.parse(prev['date'])
                 date = date.astimezone(tz.tzlocal())
                 prev["h"] = date.hour
                 prev["m"] = date.minute
                 prev["s"] = date.second
-                prev["type_i18n"] = self.types_map[self.language][prev["type"]]
+                prev["type_i18n"] = TYPES_MAP[self.language][prev["type"]]
                 self.next = next
                 self.prev = prev
                 break
@@ -116,7 +122,7 @@ class TidesScreen(Screen):
         sv.add_widget(tl)
         for tide in self.tides['extremes']:
             if self.next["dt"] < tide["dt"]:
-                uptide = Tide(summary = tide)
+                uptide = Tide(summary = tide, language = self.language)
                 tl.add_widget(uptide)
         self.tides_list.add_widget(sv)
 
