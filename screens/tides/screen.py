@@ -74,6 +74,7 @@ class TidesScreen(Screen):
         self.timedata["h"] = n.hour
         self.timedata["m"] = n.minute
         self.timedata["s"] = n.second
+        n = datetime.utcnow()
         if hasattr(self, "next_extreme") and n >= self.next_extreme:
             self.get_next()
 
