@@ -6,6 +6,13 @@
             source: 'screens/tides/images/escalles.jpg'
     BoxLayout:
         orientation: "vertical"
+        Label:
+            text: "[size=20][color=#202020]{name:s}[/color][/size]".format(**root.location)
+            markup: True
+            text_size: self.size
+            valign: "top"
+            halign: "center"
+            padding_y: 5
         BoxLayout:
             orientation: "horizontal"
             Label:
