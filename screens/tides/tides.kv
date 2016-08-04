@@ -38,6 +38,9 @@
         Label:
             text: "[size=50]{h:02d}:{m:02d}[/size][size=30] {s:02d}[/size]".format(**root.timedata)
             markup: True
+            valign: "top"
+            halign: "center"
+            text_size: self.size
         BoxLayout:
             padding: 5, 5
             id: tides_list
