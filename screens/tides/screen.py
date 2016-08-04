@@ -28,7 +28,7 @@ class Tide(BoxLayout):
         self.buildText(kwargs["summary"])
 
     def buildText(self, summary):
-        summary["ldate"] = dateutil.parser.parse(summary["date"]).strftime("%A, %H:%m")
+        summary["ldate"] = dateutil.parser.parse(summary["date"]).strftime("%A, %H:%M")
         summary["type_i18n"] = TYPES_MAP[self.language][summary["type"]]
         self.desc = ("{type_i18n:s}\n{ldate:s}").format(**summary)
 
