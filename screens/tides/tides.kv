@@ -9,10 +9,10 @@
         BoxLayout:
             orientation: "horizontal"
             Label:
-                text: "[color=#fffffff][size=60]{type_i18n:s} {h:02d}:{m:02d}[/size][/color]".format(**root.prev)
+                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.prev)
                 markup: True
             Label:
-                text: "[color=#fffffff][size=60]{type_i18n:s} {h:02d}:{m:02d}[/size][/color]".format(**root.next)
+                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.next)
                 markup: True
         Label:
             text: "[size=50]{h:02d}:{m:02d}[/size][size=30] {s:02d}[/size]".format(**root.timedata)
@@ -21,13 +21,13 @@
             orientation: "horizontal"
             padding: 5
             Label:
-                text: "[color=#8888888]Photo by Éric Leblond[/color]"
+                text: "[color=#888888]Photo by Éric Leblond[/color]"
                 text_size: self.size
                 valign: "bottom"
                 halign: "left"
                 markup: True
             Label:
-                text: "[color=#8888888]Data by Worldtides[/color]"
+                text: "[color=#888888]Data by Worldtides[/color]"
                 text_size: self.size
                 valign: "bottom"
                 halign: "right"
