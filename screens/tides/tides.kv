@@ -1,3 +1,17 @@
+<Tide>:
+    width: 150
+    size_hint_x: None
+    orientation: "vertical"
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.1, 0.1, 0.2
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: root.desc
+        valign: "middle"
+
 <TidesScreen>:
     canvas.before:
         Rectangle:
@@ -25,6 +39,11 @@
             text: "[size=50]{h:02d}:{m:02d}[/size][size=30] {s:02d}[/size]".format(**root.timedata)
             markup: True
         BoxLayout:
+            padding: 5, 5
+            id: tides_list
+            orientation: "horizontal"
+            size_hint_y: 1
+        BoxLayout:
             orientation: "horizontal"
             padding: 5
             Label:
@@ -39,3 +58,4 @@
                 valign: "bottom"
                 halign: "right"
                 markup: True
+

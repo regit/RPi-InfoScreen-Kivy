@@ -1,7 +1,9 @@
 from kivy.uix.label import Label
-from kivy.properties import DictProperty
+from kivy.properties import DictProperty, StringProperty
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
 
 import requests
 import time
@@ -13,6 +15,17 @@ import pytz
 import json
 
 MIN_TIDES = 7
+
+class Tide(BoxLayout):
+    desc = StringProperty("")
+
+    def __init__(self, **kwargs):
+        super(Tide, self).__init__(**kwargs)
+        self.buildText(kwargs["summary"])
+
+    def buildText(self, summary):
+        summary["ldate"] = dateutil.parser.parse(summary["date"]).strftime("%A, %H:%m")
+        self.desc = ("{type:s}\n{ldate:s}").format(**summary)
 
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
@@ -28,10 +41,12 @@ class TidesScreen(Screen):
         self.key = kwargs["params"]["key"]
         self.language = kwargs["params"]["language"]
         self.get_data()
-        self.get_next()
         self.get_time()
+        self.get_next()
         super(TidesScreen, self).__init__(**kwargs)
         self.timer = None
+        self.tides_list = self.ids.tides_list
+        self.build_tides_list()
 
     def buildURL(self, location):
         lon = location['coords']['lon']
@@ -53,7 +68,7 @@ class TidesScreen(Screen):
         self.timedata["h"] = n.hour
         self.timedata["m"] = n.minute
         self.timedata["s"] = n.second
-        if n >= self.next_extreme:
+        if hasattr(self, "next_extreme") and n >= self.next_extreme:
             self.get_next()
 
     def get_next(self):
@@ -88,6 +103,22 @@ class TidesScreen(Screen):
         # fetch new one if our set is small
         if len(self.tides['extremes']) <= MIN_TIDES:
             self.get_data()
+        if hasattr(self, "tides_list"):
+            self.build_tides_list()
+
+    def build_tides_list(self):
+        self.tides_list.clear_widgets()
+
+        w = (len(self.tides['extremes']) - 1) * 150
+        tl = BoxLayout(orientation="horizontal", size=(w, 60),
+                    size_hint=(None, 1), spacing=5)
+        sv = ScrollView(size_hint=(1, 1.1), bar_margin = -5, do_scroll_y = False)
+        sv.add_widget(tl)
+        for tide in self.tides['extremes']:
+            if self.next["dt"] < tide["dt"]:
+                uptide = Tide(summary = tide)
+                tl.add_widget(uptide)
+        self.tides_list.add_widget(sv)
 
     def update(self, dt):
         self.get_time()
