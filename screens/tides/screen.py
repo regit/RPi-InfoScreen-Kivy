@@ -19,6 +19,7 @@ class TidesScreen(Screen):
     timedata = DictProperty(None)
     next = DictProperty(None)
     prev = DictProperty(None)
+    location = DictProperty(None)
     types_map = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
     def __init__(self, **kwargs):
