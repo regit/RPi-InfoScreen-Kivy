@@ -30,10 +30,10 @@
         BoxLayout:
             orientation: "horizontal"
             Label:
-                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.prev)
+                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.prev_t)
                 markup: True
             Label:
-                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.next)
+                text: "[color=#202020][size=60][b]{type_i18n:s} {h:02d}:{m:02d}[/b][/size][/color]".format(**root.next_t)
                 markup: True
         Label:
             text: "[size=50]{h:02d}:{m:02d}[/size][size=30] {s:02d}[/size]".format(**root.timedata)

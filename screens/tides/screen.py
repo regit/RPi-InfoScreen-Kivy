@@ -35,8 +35,8 @@ class Tide(BoxLayout):
 class TidesScreen(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
-    next = DictProperty(None)
-    prev = DictProperty(None)
+    next_t = DictProperty(None)
+    prev_t = DictProperty(None)
     location = DictProperty(None)
 
     def __init__(self, **kwargs):
@@ -79,6 +79,10 @@ class TidesScreen(Screen):
             self.get_next()
 
     def get_next(self):
+        if self.tides == None or self.tides['status'] != u'200':
+            self.prev_t = {}
+            self.next_t = {}
+            return
         found = False
         prev = None
         oldentries = []
@@ -98,8 +102,8 @@ class TidesScreen(Screen):
                 prev["m"] = date.minute
                 prev["s"] = date.second
                 prev["type_i18n"] = TYPES_MAP[self.language][prev["type"]]
-                self.next = next
-                self.prev = prev
+                self.next_t = next
+                self.prev_t = prev
                 break
             else:
                 if prev:
@@ -122,7 +126,7 @@ class TidesScreen(Screen):
         sv = ScrollView(size_hint=(1, 1.1), bar_margin = -5, do_scroll_y = False)
         sv.add_widget(tl)
         for tide in self.tides['extremes']:
-            if self.next["dt"] < tide["dt"]:
+            if self.next_t["dt"] < tide["dt"]:
                 uptide = Tide(summary = tide, language = self.language)
                 tl.add_widget(uptide)
         self.tides_list.add_widget(sv)
