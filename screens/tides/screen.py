@@ -79,7 +79,7 @@ class TidesScreen(Screen):
             self.get_next()
 
     def get_next(self):
-        if self.tides == None or self.tides['status'] != u'200':
+        if self.tides == None or self.tides['status'] != 200:
             self.prev_t = {}
             self.next_t = {}
             return
