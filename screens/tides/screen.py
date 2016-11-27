@@ -50,7 +50,8 @@ class TidesSummary(Screen):
         if not self.get_data():
             return
         self.get_time()
-        self.get_next()
+        if not self.get_next():
+            return
         super(TidesSummary, self).__init__(**kwargs)
         self.timer = None
         self.tides_list = self.ids.tides_list
