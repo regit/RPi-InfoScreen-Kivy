@@ -4,6 +4,7 @@ from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.logger import Logger
 
 import requests
 import time
@@ -32,7 +33,7 @@ class Tide(BoxLayout):
         summary["type_i18n"] = TYPES_MAP[self.language][summary["type"]]
         self.desc = ("{type_i18n:s}\n{ldate:s}").format(**summary)
 
-class TidesScreen(Screen):
+class TidesSummary(Screen):
     tidesurl = "https://www.worldtides.info/api?extremes&lat={lat}&lon={lon}&length=172800&key={key}"
     timedata = DictProperty(None)
     next_t = DictProperty(None)
@@ -41,15 +42,16 @@ class TidesScreen(Screen):
 
     def __init__(self, **kwargs):
         # Init data by checking cache then calling API
-        self.location = kwargs["params"]["location"]
-        self.key = kwargs["params"]["key"]
-        self.language = kwargs["params"]["language"]
+        self.location = kwargs["location"]
+        self.key = kwargs["key"]
+        self.language = kwargs["language"]
         if self.language == "french":
             locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-        self.get_data()
+        if not self.get_data():
+            return
         self.get_time()
         self.get_next()
-        super(TidesScreen, self).__init__(**kwargs)
+        super(TidesSummary, self).__init__(**kwargs)
         self.timer = None
         self.tides_list = self.ids.tides_list
         self.build_tides_list()
@@ -67,6 +69,8 @@ class TidesScreen(Screen):
             self.tides = requests.get(self.url_tides).json()
         except:
             self.tides = None
+            return False
+        return True
 
     def get_time(self):
         """Sets self.timedata to current time."""
@@ -82,7 +86,7 @@ class TidesScreen(Screen):
         if self.tides == None or self.tides['status'] != 200:
             self.prev_t = {}
             self.next_t = {}
-            return
+            return False
         found = False
         prev = None
         oldentries = []
@@ -116,6 +120,7 @@ class TidesScreen(Screen):
             self.get_data()
         if hasattr(self, "tides_list"):
             self.build_tides_list()
+        return True
 
     def build_tides_list(self):
         self.tides_list.clear_widgets()
@@ -144,3 +149,43 @@ class TidesScreen(Screen):
     def on_pre_leave(self):
         # Save resource by unscheduling the updates.
         Clock.unschedule(self.timer)
+
+    def is_setup(self):
+        if self.tides:
+            return True
+        return False
+
+class TidesScreen(Screen):
+    def __init__(self, **kwargs):
+        super(TidesScreen, self).__init__(**kwargs)
+        self.running = False
+        self.location = kwargs["params"]["location"]
+        self.flt = self.ids.tides_float
+        self.key = kwargs["params"]["key"]
+        self.language = kwargs["params"]["language"]
+        self.scrmgr = self.ids.tides_scrmgr
+
+    def on_enter(self):
+        if not self.running:
+            try:
+                self.ids.tides_lbl_load.text = "Loading tides"
+                ts = TidesSummary(location = self.location,
+                        key = self.key,
+                        language = self.language
+                )
+                if not ts.is_setup():
+                    self.ids.tides_lbl_load.text = "Unable to load tides"
+                    return
+                # and add to our screen manager.
+                self.scrmgr.add_widget(ts)
+                self.running = True
+                self.flt.remove_widget(self.ids.tides_base_box)
+            except IOError:
+                self.ids.tides_lbl_load.text = "Unknown error"
+                pass
+        else:
+            # Fixes bug where nested screens don't have "on_enter" or
+            # "on_leave" methods called.
+            for c in self.scrmgr.children:
+                if c.name == self.scrmgr.current:
+                    c.on_enter()
