@@ -47,10 +47,12 @@ class TidesSummary(Screen):
         self.language = kwargs["language"]
         if self.language == "french":
             locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-        if self.get_data():
+        data_fetch = self.get_data()
+        if data_fetch:
             self.get_time()
             self.get_next()
-            super(TidesSummary, self).__init__(**kwargs)
+        super(TidesSummary, self).__init__(**kwargs)
+        if data_fetch:
             self.timer = None
             self.tides_list = self.ids.tides_list
             self.build_tides_list()
@@ -67,6 +69,7 @@ class TidesSummary(Screen):
         try:
             self.tides = requests.get(self.url_tides).json()
             if self.tides == None or self.tides['status'] != 200:
+                self.ids.tides_lbl_load.text = "Failed to load tides"
                 return False
         except:
             self.ids.tides_lbl_load.text = "Failed to load tides"
