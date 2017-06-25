@@ -47,15 +47,13 @@ class TidesSummary(Screen):
         self.language = kwargs["language"]
         if self.language == "french":
             locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-        if not self.get_data():
-            return
-        self.get_time()
-        if not self.get_next():
-            return
-        super(TidesSummary, self).__init__(**kwargs)
-        self.timer = None
-        self.tides_list = self.ids.tides_list
-        self.build_tides_list()
+        if self.get_data():
+            self.get_time()
+            self.get_next()
+            super(TidesSummary, self).__init__(**kwargs)
+            self.timer = None
+            self.tides_list = self.ids.tides_list
+            self.build_tides_list()
 
     def buildURL(self, location):
         lon = location['coords']['lon']
@@ -68,7 +66,10 @@ class TidesSummary(Screen):
         #    self.tides = json.load(data_file)
         try:
             self.tides = requests.get(self.url_tides).json()
+            if self.tides == None or self.tides['status'] != 200:
+                return False
         except:
+            self.ids.tides_lbl_load.text = "Failed to load tides"
             self.tides = None
             return False
         return True
@@ -124,6 +125,8 @@ class TidesSummary(Screen):
         return True
 
     def build_tides_list(self):
+        if self.tides == None:
+            return
         self.tides_list.clear_widgets()
 
         w = (len(self.tides['extremes']) - 1) * 150
