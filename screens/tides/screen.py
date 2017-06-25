@@ -20,6 +20,16 @@ MIN_TIDES = 7
 
 TYPES_MAP = {"english": {"High": "HW", "Low": "LW"}, "french": { "High": "HM", "Low": "BM" }}
 
+class TideException(Exception):
+    """
+    Generic class for Tide exception
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
 class Tide(BoxLayout):
     desc = StringProperty("")
 
@@ -47,11 +57,9 @@ class TidesSummary(Screen):
         self.language = kwargs["language"]
         if self.language == "french":
             locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-        if not self.get_data():
-            return
+        self.get_data()
         self.get_time()
-        if not self.get_next():
-            return
+        self.get_next()
         super(TidesSummary, self).__init__(**kwargs)
         self.timer = None
         self.tides_list = self.ids.tides_list
@@ -66,11 +74,14 @@ class TidesSummary(Screen):
         self.url_tides = self.buildURL(self.location)
         #with open('screens/tides/result.json') as data_file:    
         #    self.tides = json.load(data_file)
-        try:
-            self.tides = requests.get(self.url_tides).json()
-        except:
-            self.tides = None
-            return False
+        self.tides = requests.get(self.url_tides).json()
+        if self.tides == None or not self.tides.has_key('status'):
+            raise TideException("Unknown error")
+        if self.tides['status'] != 200:
+            if self.tides.has_key('error'):
+                raise TideException(self.tides['error'])
+            else:
+                raise TideException("Unknown error")
         return True
 
     def get_time(self):
@@ -118,12 +129,17 @@ class TidesSummary(Screen):
         self.tides['extremes'] = [x for x in self.tides['extremes'] if x not in oldentries]
         # fetch new one if our set is small
         if len(self.tides['extremes']) <= MIN_TIDES:
-            self.get_data()
+            try:
+                self.get_data()
+            except:
+                pass
         if hasattr(self, "tides_list"):
             self.build_tides_list()
         return True
 
     def build_tides_list(self):
+        if self.tides == None:
+            return
         self.tides_list.clear_widgets()
 
         w = (len(self.tides['extremes']) - 1) * 150
@@ -174,15 +190,18 @@ class TidesScreen(Screen):
                         key = self.key,
                         language = self.language
                 )
-                if not ts.is_setup():
+                if ts == None or not ts.is_setup():
                     self.ids.tides_lbl_load.text = "Unable to load tides"
                     return
                 # and add to our screen manager.
                 self.scrmgr.add_widget(ts)
                 self.running = True
                 self.flt.remove_widget(self.ids.tides_base_box)
-            except IOError:
-                self.ids.tides_lbl_load.text = "Unknown error"
+            except IOError as err:
+                self.ids.tides_lbl_load.text = "Error: " + str(err)
+                pass
+            except TideException as err:
+                self.ids.tides_lbl_load.text = "Error: " + str(err)
                 pass
         else:
             # Fixes bug where nested screens don't have "on_enter" or
